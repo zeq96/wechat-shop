@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: wechetshop
+  datasource:
+    url: jdbc:mysql://localhost:3306/wechatshop?serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  config-location: classpath:db/mybatis/config.xml
+
+wechetshop:
+  orderservice:
+    version: 1.0.0
+
+dubbo:
+  registry:
+    address: zookeeper://127.0.0.1:2181
+
+redis:
+  host: 127.0.0.1
+  port: 6379

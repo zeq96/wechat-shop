@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.andrew.wechetshop.dao.ShoppingCartQueryMapper">
+    <select id="countShopByCurrentUser" resultType="int">
+        SELECT COUNT(DISTINCT SHOP_ID)
+        FROM SHOPPING_CART
+        WHERE USER_ID = #{userId}
+          AND STATUS = 'ok';
+    </select>
+
+    <select id="selectShoppingCartDataByCurrentUser" resultMap="ShoppingCartResultMap">
+        SELECT SHOP.ID              AS SHOP_ID,
+               SHOP.NAME            AS SHOP_NAME,
+               SHOP.DESCRIPTION     AS SHOP_DESCRIPTION,
+               SHOP.IMG_URL         AS SHOP_IMG_URL,
+               SHOP.OWNER_USER_ID   AS SHOP_OWNER_USER_ID,
+               SHOP.CREATED_AT      AS SHOP_CREATED_AT,
+               SHOP.UPDATED_AT      AS SHOP_UPDATED_AT,
+               GOODS.ID             AS GOODS_ID,
+               GOODS.NAME           AS GOODS_NAME,
+               GOODS.DESCRIPTION    AS GOODS_DESCRIPTION,
+               GOODS.DETAILS        AS GOODS_DETAILS,
+               GOODS.IMG_URL        AS GOODS_IMG_URL,
+               GOODS.PRICE          AS GOODS_PRICE,
+               SHOPPING_CART.NUMBER AS GOODS_NUMBER,
+               GOODS.CREATED_AT     AS GOODS_CREATED_AT,
+               GOODS.UPDATED_AT     AS GOODS_UPDATED_AT
+        FROM (
+                 SELECT DISTINCT SHOP_ID
+                 FROM SHOPPING_CART
+                 WHERE USER_ID = #{userId}
+                   AND STATUS = 'ok'
+                     LIMIT #{limit}, #{offset}
+             ) SHOPS
+                 JOIN SHOPPING_CART
+                      ON SHOPS.SHOP_ID = SHOPPING_CART.SHOP_ID
+                 JOIN GOODS ON SHOPPING_CART.GOODS_ID = GOODS.ID
+                 JOIN SHOP ON SHOPS.SHOP_ID = SHOP.ID
+    </select>
+
+    <select id="selectShoppingCartDataByCurrentUserAndShopId" resultMap="ShoppingCartResultMap">
+        SELECT SHOP.ID              AS SHOP_ID,
+               SHOP.NAME            AS SHOP_NAME,
+               SHOP.DESCRIPTION     AS SHOP_DESCRIPTION,
+               SHOP.IMG_URL         AS SHOP_IMG_URL,
+               SHOP.OWNER_USER_ID   AS SHOP_OWNER_USER_ID,
+               SHOP.CREATED_AT      AS SHOP_CREATED_AT,
+               SHOP.UPDATED_AT      AS SHOP_UPDATED_AT,
+               GOODS.ID             AS GOODS_ID,
+               GOODS.NAME           AS GOODS_NAME,
+               GOODS.DESCRIPTION    AS GOODS_DESCRIPTION,
+               GOODS.DETAILS        AS GOODS_DETAILS,
+               GOODS.IMG_URL        AS GOODS_IMG_URL,
+               GOODS.PRICE          AS GOODS_PRICE,
+               SHOPPING_CART.NUMBER AS GOODS_NUMBER,
+               GOODS.CREATED_AT     AS GOODS_CREATED_AT,
+               GOODS.UPDATED_AT     AS GOODS_UPDATED_AT
+        FROM SHOPPING_CART
+                 JOIN GOODS ON SHOPPING_CART.GOODS_ID = GOODS.ID
+                 JOIN SHOP ON SHOPPING_CART.SHOP_ID = SHOP.ID
+        WHERE USER_ID = #{userId} AND SHOPPING_CART.SHOP_ID = #{shopId} AND SHOPPING_CART.STATUS = 'ok'
+    </select>
+
+    <resultMap id="ShoppingCartResultMap" type="com.andrew.wechetshop.entity.ShoppingCartData">
+        <association property="shop" javaType="com.andrew.wechetshop.generate.Shop">
+            <id property="id" column="SHOP_ID" />
+            <result property="name" column="SHOP_NAME" />
+            <result property="description" column="SHOP_DESCRIPTION" />
+            <result property="imgUrl" column="SHOP_IMG_URL" />
+            <result property="ownerUserId" column="SHOP_OWNER_USER_ID" />
+            <result property="createdAt" column="SHOP_CREATED_AT" />
+            <result property="updatedAt" column="SHOP_UPDATED_AT" />
+        </association>
+        <collection property="goods" ofType="com.andrew.wechetshop.entity.GoodsWithNumber">
+            <id property="id" column="GOODS_ID"/>
+            <result property="name" column="GOODS_NAME" />
+            <result property="description" column="GOODS_DESCRIPTION" />
+            <result property="details" column="GOODS_DETAILS" />
+            <result property="imgUrl" column="GOODS_IMG_URL" />
+            <result property="price" column="GOODS_PRICE" />
+            <result property="number" column="GOODS_NUMBER" />
+            <result property="createdAt" column="GOODS_CREATED_AT" />
+            <result property="updatedAt" column="GOODS_UPDATED_AT" />
+            <result property="shopId" column="SHOP_ID" />
+        </collection>
+    </resultMap>
+
+    <update id="deleteGoodsInShoppingCart">
+        UPDATE SHOPPING_CART
+        SET STATUS     = 'deleted',
+            UPDATED_AT = NOW()
+        WHERE USER_ID = #{userId}
+          AND GOODS_ID = #{goodsId}
+    </update>
+
+</mapper>

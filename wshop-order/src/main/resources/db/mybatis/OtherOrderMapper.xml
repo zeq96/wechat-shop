@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.andrew.wechetshop.order.mapper.OtherOrderMapper">
+    <insert id="insertOrders" parameterType="com.andrew.wechetshop.api.entity.OrderInfo">
+        insert into ORDER_GOODS (GOODS_ID, ORDER_ID, NUMBER)
+        values
+        <foreach collection="goods" item="item" separator=",">
+            (#{item.id}, #{orderId}, #{item.number})
+        </foreach>
+    </insert>
+    
+    <select id="getGoodsInfoOfOrder" resultType="com.andrew.wechetshop.api.entity.GoodsInfo">
+        SELECT GOODS_ID AS id,
+               NUMBER AS number
+        FROM ORDER_GOODS
+        WHERE ORDER_ID = #{orderId}
+    </select>
+</mapper>

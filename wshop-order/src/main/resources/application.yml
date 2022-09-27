@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: wechetshop-order
+  datasource:
+    url: jdbc:mysql://localhost:3306/order?serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  config-location: classpath:db/mybatis/config.xml
+
+server:
+  port: 8081
+
+dubbo:
+  registry:
+    address: zookeeper://127.0.0.1:2181
+  scan:
+    base-packages: com.andrew.wechetshop.order.service
+
+wechetshop:
+  orderservice:
+    version: 1.0.0
